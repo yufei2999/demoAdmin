@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="SysUser">
+
+    <resultMap id="SysUserMap" type="com.yufei.sys.model.SysUser">
+        <result property="id" column="id"/>
+        <result property="userName" column="user_name"/>
+        <result property="showName" column="show_name"/>
+        <result property="password" column="password"/>
+        <result property="mobile" column="mobile"/>
+        <result property="status" column="status"/>
+        <result property="lastLoginIp" column="last_login_ip"/>
+        <result property="lastLoginTime" column="last_login_time"/>
+        <result property="remark" column="remark"/>
+        <result property="creator" column="creator"/>
+        <result property="createTime" column="create_time"/>
+        <result property="lastModifier" column="last_modifier"/>
+        <result property="lastModifyTime" column="last_modify_time"/>
+        <result property="deleted" column="deleted"/>
+    </resultMap>
+
+	<!-- common columns -->
+	<sql id="columns">
+	    <![CDATA[
+        id, user_name, show_name, password, mobile, status, last_login_ip, last_login_time, remark, creator, create_time, last_modifier, last_modify_time, deleted
+	    ]]>
+	</sql>
+	
+    <insert id="insert" >
+    <![CDATA[
+        INSERT INTO sys_user (
+	        id, 
+	        user_name, 
+	        show_name, 
+	        password, 
+	        mobile, 
+	        status, 
+	        last_login_ip, 
+	        last_login_time, 
+	        remark, 
+	        creator, 
+	        create_time, 
+	        last_modifier,
+	        last_modify_time, 
+	        deleted
+        ) VALUES (
+        	#{id, jdbcType=VARCHAR}, 
+        	#{userName, jdbcType=VARCHAR}, 
+        	#{showName, jdbcType=VARCHAR}, 
+        	#{password, jdbcType=VARCHAR}, 
+        	#{mobile, jdbcType=VARCHAR}, 
+        	#{status, jdbcType=INTEGER}, 
+        	#{lastLoginIp, jdbcType=VARCHAR}, 
+        	#{lastLoginTime, jdbcType=TIMESTAMP}, 
+        	#{remark, jdbcType=VARCHAR}, 
+        	#{creator, jdbcType=VARCHAR}, 
+        	#{createTime, jdbcType=TIMESTAMP}, 
+        	#{lastModifier, jdbcType=VARCHAR},
+        	#{lastModifyTime, jdbcType=TIMESTAMP}, 
+        	#{deleted, jdbcType=INTEGER}
+        )
+    ]]>
+    </insert>
+
+    <update id="update" >
+    <![CDATA[
+        UPDATE sys_user SET
+	        user_name = #{userName, jdbcType=VARCHAR}, 
+	        show_name = #{showName, jdbcType=VARCHAR}, 
+	        password = #{password, jdbcType=VARCHAR}, 
+	        mobile = #{mobile, jdbcType=VARCHAR}, 
+	        status = #{status, jdbcType=INTEGER}, 
+	        last_login_ip = #{lastLoginIp, jdbcType=VARCHAR}, 
+	        last_login_time = #{lastLoginTime, jdbcType=TIMESTAMP}, 
+	        remark = #{remark, jdbcType=VARCHAR}, 
+	        creator = #{creator, jdbcType=VARCHAR}, 
+	        create_time = #{createTime, jdbcType=TIMESTAMP}, 
+	        last_modifier = #{lastModifier, jdbcType=VARCHAR},
+	        last_modify_time = #{lastModifyTime, jdbcType=TIMESTAMP}, 
+	        deleted = #{deleted, jdbcType=INTEGER}
+        WHERE 
+	        id = #{id}
+    ]]>
+    </update>
+
+    <delete id="delete">
+        DELETE FROM sys_user WHERE id IN
+        <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+        	#{item}
+        </foreach>
+    </delete>
+    
+    <select id="getById" resultMap="SysUserMap">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM sys_user 
+	        WHERE 
+		        id = #{id}
+	    ]]>
+    </select>
+
+	<sql id="findWhere">
+	    <where>
+	    	<choose>
+	    		<when test="queryType==0">
+			       	<if test="@Ognl@isNotEmpty(userName)">
+	   			 		AND user_name = #{userName}
+	   			   	</if>
+			       	<if test="@Ognl@isNotEmpty(showName)">
+	   			 		AND show_name = #{showName}
+	   			   	</if>
+			       	<if test="@Ognl@isNotEmpty(password)">
+	   			 		AND password = #{password}
+	   			   	</if>
+			       	<if test="@Ognl@isNotEmpty(mobile)">
+	   			 		AND mobile = #{mobile}
+	   			   	</if>
+			       	<if test="@Ognl@isNotEmpty(lastLoginIp)">
+	   			 		AND last_login_ip = #{lastLoginIp}
+	   			   	</if>
+			       	<if test="@Ognl@isNotEmpty(remark)">
+	   			 		AND remark = #{remark}
+	   			   	</if>
+			       	<if test="@Ognl@isNotEmpty(creator)">
+	   			 		AND creator = #{creator}
+	   			   	</if>
+			       	<if test="@Ognl@isNotEmpty(lastModifier)">
+	   			 		AND last_modifier = #{lastModifier}
+	   			   	</if>
+	       		</when>
+	       		<otherwise>
+				    <if test="@Ognl@isNotEmpty(userName)">
+			   			AND user_name LIKE CONCAT('%', #{userName},'%')
+			   		</if>
+				    <if test="@Ognl@isNotEmpty(showName)">
+			   			AND show_name LIKE CONCAT('%', #{showName},'%')
+			   		</if>
+				    <if test="@Ognl@isNotEmpty(password)">
+			   			AND password LIKE CONCAT('%', #{password},'%')
+			   		</if>
+				    <if test="@Ognl@isNotEmpty(mobile)">
+			   			AND mobile LIKE CONCAT('%', #{mobile},'%')
+			   		</if>
+				    <if test="@Ognl@isNotEmpty(lastLoginIp)">
+			   			AND last_login_ip LIKE CONCAT('%', #{lastLoginIp},'%')
+			   		</if>
+				    <if test="@Ognl@isNotEmpty(remark)">
+			   			AND remark LIKE CONCAT('%', #{remark},'%')
+			   		</if>
+				    <if test="@Ognl@isNotEmpty(creator)">
+			   			AND creator LIKE CONCAT('%', #{creator},'%')
+			   		</if>
+				    <if test="@Ognl@isNotEmpty(lastModifier)">
+			   			AND last_modifier LIKE CONCAT('%', #{lastModifier},'%')
+			   		</if>
+		        </otherwise>
+	      	</choose>
+		   	<if test="@Ognl@isNotEmpty(id)">
+			    AND id = #{id}
+			</if>
+		   	<if test="@Ognl@isNotEmpty(status)">
+			    AND status = #{status}
+			</if>
+		   	<if test="@Ognl@isNotEmpty(lastLoginTimeBegin)">
+		   		AND last_login_time >= #{lastLoginTimeBegin}
+		   	</if>
+		   	<if test="@Ognl@isNotEmpty(lastLoginTimeEnd)">
+		   		AND last_login_time &lt; #{lastLoginTimeEnd}
+		   	</if>
+		   	<if test="@Ognl@isNotEmpty(createTimeBegin)">
+		   		AND create_time >= #{createTimeBegin}
+		   	</if>
+		   	<if test="@Ognl@isNotEmpty(createTimeEnd)">
+		   		AND create_time &lt; #{createTimeEnd}
+		   	</if>
+		   	<if test="@Ognl@isNotEmpty(lastModifyTimeBegin)">
+		   		AND last_modify_time >= #{lastModifyTimeBegin}
+		   	</if>
+		   	<if test="@Ognl@isNotEmpty(lastModifyTimeEnd)">
+		   		AND last_modify_time &lt; #{lastModifyTimeEnd}
+		   	</if>
+		   	<if test="@Ognl@isNotEmpty(deleted)">
+			    AND deleted = #{deleted}
+			</if>
+	    </where>
+	</sql>
+	 
+    <select id="findPageCount" resultType="long">
+        SELECT count(*) FROM sys_user <include refid="findWhere"/>
+    </select>
+
+	<!--
+        Paging query has been using Dialect for paging, you can not use Dialect directly to write the page
+        Because the paging query will pass #offset#, #pageSize#, #lastRows# three parameters, the different database can be based on the three parameters of the application of different attributes to achieve
+    -->
+    <select id="findPage" resultMap="SysUserMap">
+    	SELECT <include refid="columns"/> FROM sys_user 
+		<include refid="findWhere"/>
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+	
+	<select id="find" resultMap="SysUserMap">
+	    SELECT <include refid="columns"/> FROM sys_user 
+		<include refid="findWhere"/>
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+	
+</mapper>

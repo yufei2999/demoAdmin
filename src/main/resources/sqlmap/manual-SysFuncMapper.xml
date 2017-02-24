@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manual-SysFunc">
+
+    <!-- 权限列表 -->
+    <select id="findByParentId" resultMap="SysFunc.SysFuncMap">
+        SELECT * FROM sys_func
+        WHERE parent_id = #{parentId} AND deleted = 1
+    </select>
+
+    <!-- 根据parentId查询parentcode -->
+    <select id="findCodeByParentId" resultType="string">
+        SELECT  ${codeColumnName}  FROM ${tableName}
+        WHERE  id = #{parentId}  and deleted = 1
+    </select>
+
+    <!-- 查询所有父级等于parentId的子集code集合 -->
+    <select id="findChildrenCodeListByParentId" resultType="string">
+        SELECT  ${codeColumnName}  FROM ${tableName}
+        WHERE  parent_id = #{parentId}  and deleted = 1
+    </select>
+
+    <!-- 获取parentId = 0 的所有code -->
+    <select id="findByAllCodeParentIdEQZero" resultType="string">
+        SELECT ${codeColumnName} FROM ${tableName}
+        WHERE parent_id = #{parentIdZero}  and deleted = 1
+    </select>
+
+    <!-- 逻辑删除 -->
+    <update id="deleteFuncTree">
+        UPDATE sys_func SET deleted = 0 WHERE id = #{parentId}
+    </update>
+
+    <!-- 权限列表 -->
+    <select id="getFuncListByRoleIds" resultMap="SysFunc.SysFuncMap">
+        SELECT DISTINCT f.id ,f.func_name ,f.func_code ,f.url ,f.parent_id ,f.parent_ids
+        FROM  sys_func f
+        LEFT JOIN sys_role_func rf ON rf.func_id = f.id AND rf.deleted = 1
+        WHERE f.deleted = 1 AND rf.role_id IN
+        <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        ORDER BY f.sort
+    </select>
+
+</mapper>

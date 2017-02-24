@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="SysFunc">
+
+    <resultMap id="SysFuncMap" type="com.yufei.sys.model.SysFunc">
+        <result property="id" column="id"/>
+        <result property="funcName" column="func_name"/>
+        <result property="funcCode" column="func_code"/>
+        <result property="url" column="url"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="parentIds" column="parent_ids"/>
+        <result property="sort" column="sort"/>
+        <result property="remark" column="remark"/>
+        <result property="creator" column="creator"/>
+        <result property="createTime" column="create_time"/>
+        <result property="lastModifier" column="last_modifier"/>
+        <result property="lastModifyTime" column="last_modify_time"/>
+        <result property="deleted" column="deleted"/>
+    </resultMap>
+
+	<!-- common columns -->
+	<sql id="columns">
+	    <![CDATA[
+        id, func_name, func_code, url, parent_id, parent_ids, sort, remark, creator, create_time, last_modifier, last_modify_time, deleted
+	    ]]>
+	</sql>
+	
+    <insert id="insert" >
+    <![CDATA[
+        INSERT INTO sys_func (
+	        id, 
+	        func_name, 
+	        func_code, 
+	        url, 
+	        parent_id, 
+	        parent_ids, 
+	        sort, 
+	        remark, 
+	        creator, 
+	        create_time, 
+	        last_modifier,
+	        last_modify_time, 
+	        deleted
+        ) VALUES (
+        	#{id, jdbcType=VARCHAR}, 
+        	#{funcName, jdbcType=VARCHAR}, 
+        	#{funcCode, jdbcType=VARCHAR}, 
+        	#{url, jdbcType=VARCHAR}, 
+        	#{parentId, jdbcType=VARCHAR}, 
+        	#{parentIds, jdbcType=VARCHAR}, 
+        	#{sort, jdbcType=INTEGER}, 
+        	#{remark, jdbcType=VARCHAR}, 
+        	#{creator, jdbcType=VARCHAR}, 
+        	#{createTime, jdbcType=TIMESTAMP}, 
+        	#{lastModifier, jdbcType=VARCHAR},
+        	#{lastModifyTime, jdbcType=TIMESTAMP}, 
+        	#{deleted, jdbcType=INTEGER}
+        )
+    ]]>
+    </insert>
+
+    <update id="update" >
+    <![CDATA[
+        UPDATE sys_func SET
+	        func_name = #{funcName, jdbcType=VARCHAR}, 
+	        func_code = #{funcCode, jdbcType=VARCHAR}, 
+	        url = #{url, jdbcType=VARCHAR}, 
+	        parent_id = #{parentId, jdbcType=VARCHAR}, 
+	        parent_ids = #{parentIds, jdbcType=VARCHAR}, 
+	        sort = #{sort, jdbcType=INTEGER}, 
+	        remark = #{remark, jdbcType=VARCHAR}, 
+	        creator = #{creator, jdbcType=VARCHAR}, 
+	        create_time = #{createTime, jdbcType=TIMESTAMP}, 
+	        last_modifier = #{lastModifier, jdbcType=VARCHAR},
+	        last_modify_time = #{lastModifyTime, jdbcType=TIMESTAMP}, 
+	        deleted = #{deleted, jdbcType=INTEGER}
+        WHERE 
+	        id = #{id}
+    ]]>
+    </update>
+
+    <delete id="delete">
+        DELETE FROM sys_func WHERE id IN
+		<foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+    </delete>
+    
+    <select id="getById" resultMap="SysFuncMap">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM sys_func 
+	        WHERE 
+		        id = #{id}
+	    ]]>
+    </select>
+
+	<sql id="findWhere">
+	    <where>
+	    	<choose>
+	    		<when test="queryType==0">
+			       	<if test="@Ognl@isNotEmpty(funcName)">
+	   			 		AND func_name = #{funcName}
+	   			   	</if>
+			       	<if test="@Ognl@isNotEmpty(funcCode)">
+	   			 		AND func_code = #{funcCode}
+	   			   	</if>
+			       	<if test="@Ognl@isNotEmpty(url)">
+	   			 		AND url = #{url}
+	   			   	</if>
+			       	<if test="@Ognl@isNotEmpty(parentId)">
+	   			 		AND parent_id = #{parentId}
+	   			   	</if>
+			       	<if test="@Ognl@isNotEmpty(parentIds)">
+	   			 		AND parent_ids = #{parentIds}
+	   			   	</if>
+			       	<if test="@Ognl@isNotEmpty(remark)">
+	   			 		AND remark = #{remark}
+	   			   	</if>
+			       	<if test="@Ognl@isNotEmpty(creator)">
+	   			 		AND creator = #{creator}
+	   			   	</if>
+			       	<if test="@Ognl@isNotEmpty(lastModifier)">
+	   			 		AND last_modifier = #{lastModifier}
+	   			   	</if>
+	       		</when>
+	       		<otherwise>
+				    <if test="@Ognl@isNotEmpty(funcName)">
+			   			AND func_name LIKE CONCAT('%', #{funcName},'%')
+			   		</if>
+				    <if test="@Ognl@isNotEmpty(funcCode)">
+			   			AND func_code LIKE CONCAT('%', #{funcCode},'%')
+			   		</if>
+				    <if test="@Ognl@isNotEmpty(url)">
+			   			AND url LIKE CONCAT('%', #{url},'%')
+			   		</if>
+				    <if test="@Ognl@isNotEmpty(parentId)">
+			   			AND parent_id LIKE CONCAT('%', #{parentId},'%')
+			   		</if>
+				    <if test="@Ognl@isNotEmpty(parentIds)">
+			   			AND parent_ids LIKE CONCAT('%', #{parentIds},'%')
+			   		</if>
+				    <if test="@Ognl@isNotEmpty(remark)">
+			   			AND remark LIKE CONCAT('%', #{remark},'%')
+			   		</if>
+				    <if test="@Ognl@isNotEmpty(creator)">
+			   			AND creator LIKE CONCAT('%', #{creator},'%')
+			   		</if>
+				    <if test="@Ognl@isNotEmpty(lastModifier)">
+			   			AND last_modifier LIKE CONCAT('%', #{lastModifier},'%')
+			   		</if>
+		        </otherwise>
+	      	</choose>
+		   	<if test="@Ognl@isNotEmpty(id)">
+			    AND id = #{id}
+			</if>
+		   	<if test="@Ognl@isNotEmpty(sort)">
+			    AND sort = #{sort}
+			</if>
+		   	<if test="@Ognl@isNotEmpty(createTimeBegin)">
+		   		AND create_time >= #{createTimeBegin}
+		   	</if>
+		   	<if test="@Ognl@isNotEmpty(createTimeEnd)">
+		   		AND create_time &lt; #{createTimeEnd}
+		   	</if>
+		   	<if test="@Ognl@isNotEmpty(lastModifyTimeBegin)">
+		   		AND last_modify_time >= #{lastModifyTimeBegin}
+		   	</if>
+		   	<if test="@Ognl@isNotEmpty(lastModifyTimeEnd)">
+		   		AND last_modify_time &lt; #{lastModifyTimeEnd}
+		   	</if>
+		   	<if test="@Ognl@isNotEmpty(deleted)">
+			    AND deleted = #{deleted}
+			</if>
+	    </where>
+	</sql>
+	 
+    <select id="findPageCount" resultType="long">
+        SELECT count(*) FROM sys_func <include refid="findWhere"/>
+    </select>
+
+	<!--
+        Paging query has been using Dialect for paging, you can not use Dialect directly to write the page
+        Because the paging query will pass #offset#, #pageSize#, #lastRows# three parameters, the different database can be based on the three parameters of the application of different attributes to achieve
+    -->
+    <select id="findPage" resultMap="SysFuncMap">
+    	SELECT <include refid="columns"/> FROM sys_func 
+		<include refid="findWhere"/>
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+	
+	<select id="find" resultMap="SysFuncMap">
+	    SELECT <include refid="columns"/> FROM sys_func 
+		<include refid="findWhere"/>
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+	
+</mapper>

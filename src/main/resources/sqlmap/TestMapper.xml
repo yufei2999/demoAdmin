@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Test">
+    <resultMap id="TestMap" type="com.yufei.test.model.Test">
+        <result property="testId" column="TEST_ID"/>
+        <result property="content" column="CONTENT"/>
+        <result property="createTime" column="CREATE_TIME"/>
+    </resultMap>
+
+	<!-- common columns -->
+	<sql id="columns">
+	    <![CDATA[
+        TEST_ID, CONTENT, CREATE_TIME
+	    ]]>
+	</sql>
+	
+    <insert id="insert" >
+    <![CDATA[
+        INSERT INTO TEST (
+	        TEST_ID, 
+	        CONTENT, 
+	        CREATE_TIME
+        ) VALUES (
+        	#{testId, jdbcType=DECIMAL}, 
+        	#{content, jdbcType=VARCHAR}, 
+        	#{createTime, jdbcType=DATE}
+        )
+    ]]>
+    </insert>
+
+    <update id="update" >
+    <![CDATA[
+        UPDATE TEST SET
+	        CONTENT = #{content, jdbcType=VARCHAR}, 
+	        CREATE_TIME = #{createTime, jdbcType=DATE}
+        WHERE 
+	        TEST_ID = #{testId}
+    ]]>
+    </update>
+
+    <delete id="delete">
+    <![CDATA[
+        DELETE FROM TEST WHERE
+        TEST_ID = #{testId}
+    ]]>
+    </delete>
+    
+    <select id="getById" resultMap="TestMap">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM TEST 
+	        WHERE 
+		        TEST_ID = #{testId}
+	    ]]>
+    </select>
+
+	<sql id="findWhere">
+	    <where>
+	    	<choose>
+	    		<when test="queryType==0">
+			       	<if test="@Ognl@isNotEmpty(content)">
+	   			 		AND CONTENT = #{content}
+	   			   	</if>
+	       		</when>
+	       		<otherwise>
+				    <if test="@Ognl@isNotEmpty(content)">
+			   			AND CONTENT LIKE  <![CDATA['%${content}%' ]]>
+			   		</if>
+		        </otherwise>
+	      	</choose>
+		   	<if test="@Ognl@isNotEmpty(testId)">
+			    AND TEST_ID = #{testId}
+			</if>
+		   	<if test="@Ognl@isNotEmpty(createTimeBegin)">
+		   		AND CREATE_TIME >= #{createTimeBegin}
+		   	</if>
+		   	<if test="@Ognl@isNotEmpty(createTimeEnd)">
+		   		AND CREATE_TIME &lt; #{createTimeEnd}
+		   	</if>
+	    </where>
+	</sql>
+	 
+    <select id="findPageCount" resultType="long">
+        SELECT count(*) FROM TEST <include refid="findWhere"/>    
+    </select>
+    
+    <!-- findPage -->
+    <select id="findPage" resultMap="TestMap">
+    	SELECT <include refid="columns"/> FROM TEST 
+		<include refid="findWhere"/>
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+	
+	<select id="find" resultMap="TestMap">
+	    SELECT <include refid="columns"/> FROM TEST 
+		<include refid="findWhere"/>
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+    
+</mapper>

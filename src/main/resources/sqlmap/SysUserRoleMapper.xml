@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="SysUserRole">
+
+    <resultMap id="SysUserRoleMap" type="com.yufei.sys.model.SysUserRole">
+        <result property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="roleId" column="role_id"/>
+        <result property="creator" column="creator"/>
+        <result property="createTime" column="create_time"/>
+        <result property="lastModifier" column="last_modifier"/>
+        <result property="lastModifyTime" column="last_modify_time"/>
+        <result property="deleted" column="deleted"/>
+    </resultMap>
+
+	<!-- common columns -->
+	<sql id="columns">
+	    <![CDATA[
+        id, user_id, role_id, creator, create_time, last_modifier, last_modify_time, deleted
+	    ]]>
+	</sql>
+	
+    <insert id="insert" >
+    <![CDATA[
+        INSERT INTO sys_user_role (
+	        id, 
+	        user_id, 
+	        role_id, 
+	        creator, 
+	        create_time, 
+	        last_modifier,
+	        last_modify_time, 
+	        deleted
+        ) VALUES (
+        	#{id, jdbcType=VARCHAR}, 
+        	#{userId, jdbcType=VARCHAR}, 
+        	#{roleId, jdbcType=VARCHAR}, 
+        	#{creator, jdbcType=VARCHAR}, 
+        	#{createTime, jdbcType=TIMESTAMP}, 
+        	#{lastModifier, jdbcType=VARCHAR},
+        	#{lastModifyTime, jdbcType=TIMESTAMP}, 
+        	#{deleted, jdbcType=INTEGER}
+        )
+    ]]>
+    </insert>
+
+    <update id="update" >
+    <![CDATA[
+        UPDATE sys_user_role SET
+	        user_id = #{userId, jdbcType=VARCHAR}, 
+	        role_id = #{roleId, jdbcType=VARCHAR}, 
+	        creator = #{creator, jdbcType=VARCHAR}, 
+	        create_time = #{createTime, jdbcType=TIMESTAMP}, 
+	        last_modifier = #{lastModifier, jdbcType=VARCHAR},
+	        last_modify_time = #{lastModifyTime, jdbcType=TIMESTAMP}, 
+	        deleted = #{deleted, jdbcType=INTEGER}
+        WHERE 
+	        id = #{id}
+    ]]>
+    </update>
+
+    <delete id="delete">
+        DELETE FROM sys_user_role WHERE id IN
+		<foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+    </delete>
+    
+    <select id="getById" resultMap="SysUserRoleMap">
+	    SELECT <include refid="columns"/>
+	    <![CDATA[
+	        FROM sys_user_role 
+	        WHERE 
+		        id = #{id}
+	    ]]>
+    </select>
+
+	<sql id="findWhere">
+	    <where>
+	    	<choose>
+	    		<when test="queryType==0">
+			       	<if test="@Ognl@isNotEmpty(userId)">
+	   			 		AND user_id = #{userId}
+	   			   	</if>
+			       	<if test="@Ognl@isNotEmpty(roleId)">
+	   			 		AND role_id = #{roleId}
+	   			   	</if>
+			       	<if test="@Ognl@isNotEmpty(creator)">
+	   			 		AND creator = #{creator}
+	   			   	</if>
+			       	<if test="@Ognl@isNotEmpty(lastModifier)">
+	   			 		AND last_modifier = #{lastModifier}
+	   			   	</if>
+	       		</when>
+	       		<otherwise>
+				    <if test="@Ognl@isNotEmpty(userId)">
+			   			AND user_id LIKE CONCAT('%', #{userId},'%')
+			   		</if>
+				    <if test="@Ognl@isNotEmpty(roleId)">
+			   			AND role_id LIKE CONCAT('%', #{roleId},'%')
+			   		</if>
+				    <if test="@Ognl@isNotEmpty(creator)">
+			   			AND creator LIKE CONCAT('%', #{creator},'%')
+			   		</if>
+				    <if test="@Ognl@isNotEmpty(lastModifier)">
+			   			AND last_modifier LIKE CONCAT('%', #{lastModifier},'%')
+			   		</if>
+		        </otherwise>
+	      	</choose>
+		   	<if test="@Ognl@isNotEmpty(id)">
+			    AND id = #{id}
+			</if>
+		   	<if test="@Ognl@isNotEmpty(createTimeBegin)">
+		   		AND create_time >= #{createTimeBegin}
+		   	</if>
+		   	<if test="@Ognl@isNotEmpty(createTimeEnd)">
+		   		AND create_time &lt; #{createTimeEnd}
+		   	</if>
+		   	<if test="@Ognl@isNotEmpty(lastModifyTimeBegin)">
+		   		AND last_modify_time >= #{lastModifyTimeBegin}
+		   	</if>
+		   	<if test="@Ognl@isNotEmpty(lastModifyTimeEnd)">
+		   		AND last_modify_time &lt; #{lastModifyTimeEnd}
+		   	</if>
+		   	<if test="@Ognl@isNotEmpty(deleted)">
+			    AND deleted = #{deleted}
+			</if>
+	    </where>
+	</sql>
+	 
+    <select id="findPageCount" resultType="long">
+        SELECT count(*) FROM sys_user_role <include refid="findWhere"/>
+    </select>
+
+	<!--
+        Paging query has been using Dialect for paging, you can not use Dialect directly to write the page
+        Because the paging query will pass #offset#, #pageSize#, #lastRows# three parameters, the different database can be based on the three parameters of the application of different attributes to achieve
+    -->
+    <select id="findPage" resultMap="SysUserRoleMap">
+    	SELECT <include refid="columns"/> FROM sys_user_role 
+		<include refid="findWhere"/>
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+
+	
+	<select id="find" resultMap="SysUserRoleMap">
+	    SELECT <include refid="columns"/> FROM sys_user_role 
+		<include refid="findWhere"/>
+		<if test="@Ognl@isNotEmpty(sortColumns)">
+			ORDER BY ${sortColumns}
+		</if>
+    </select>
+	
+</mapper>

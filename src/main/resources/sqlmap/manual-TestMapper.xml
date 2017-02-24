@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="manual-Test">
+    <resultMap id="TestMap" type="com.yufei.test.model.Test">
+        <result property="testId" column="TEST_ID"/>
+        <result property="content" column="CONTENT"/>
+        <result property="createTime" column="CREATE_TIME"/>
+    </resultMap>
+    
+    <!-- test count -->
+    <select id="queryTestPageCount" resultType="int">
+	    SELECT COUNT(*) FROM TEST <include refid="queryWhere"/>
+    </select>
+    
+    <!-- test -->
+	<select id="queryTestPage" resultMap="TestMap">
+	    SELECT * FROM TEST <include refid="queryWhere"/>
+		ORDER BY TEST_ID DESC
+    </select>
+    
+	<sql id="queryWhere">
+	    <where>
+		   	<if test="@Ognl@isNotEmpty(testId)">
+		   		AND TEST_ID = #{testId}
+		   	</if>
+		   	<if test="@Ognl@isNotEmpty(createTimeBegin)">
+		   		AND CREATE_TIME >= #{createTimeBegin}
+		   	</if>
+		   	<if test="@Ognl@isNotEmpty(createTimeEnd)">
+		   		AND CREATE_TIME &lt; DATE_ADD(#{createTimeEnd}, INTERVAL 1 DAY)
+		   	</if>
+	    </where>
+	</sql>
+	
+</mapper>
+

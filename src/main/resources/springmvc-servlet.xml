@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context-3.0.xsd
+    http://www.springframework.org/schema/mvc
+    http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+    
+    
+    <mvc:default-servlet-handler />
+    
+    <!-- component-scan自动搜索@Component, @Controller, @Service, @Repository等标注的类 -->
+	<context:component-scan base-package="com.yufei"/>
+    <!-- 默认的注解映射的支持 -->
+    <mvc:annotation-driven/>
+
+    <!-- 配置资源文件,防止被拦截 -->
+    <mvc:resources location="/static/images/" mapping="/static/image/**"/>
+    <mvc:resources location="/static/js/" mapping="/static/js/**"/>
+    <mvc:resources location="/static/css/" mapping="/static/css/**"/>
+
+    <!-- 拦截器 -->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/*"/>
+            <mvc:mapping path="/*/*"/>
+            <bean class="com.yufei.common.interceptor.RightInterceptor">
+                <property name="excludedUrls">
+                    <list>
+                        <value>/index.jsp</value>
+                        <value>/login/login</value>
+                    </list>
+                </property>
+            </bean>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+	<!-- 乱码处理 -->
+	<bean class="com.yufei.utils.UTF8StringBeanPostProcessor"></bean>
+	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+        <property name="cacheSeconds" value="0" />
+        <property name="messageConverters">
+             <list>
+                 <bean class = "org.springframework.http.converter.StringHttpMessageConverter">
+                    <property name = "supportedMediaTypes">
+                          <list>
+                              <value>text/html;charset=UTF-8</value>
+                         </list>
+                    </property>
+                 </bean>
+            </list>
+        </property>
+    </bean>
+
+	<!-- jsp页面解析器，当Controller返回XXX字符串时，先通过拦截器，然后该类就会在/pages/目录下，查找XXX.jsp文件-->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/pages/"/>
+		<property name="suffix" value=".jsp"/>
+	</bean>
+	
+</beans>
